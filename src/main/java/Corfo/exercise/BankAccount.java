@@ -4,9 +4,9 @@ import java.util.List;
 
 // Clase abstracta CuentaBancaria
 public abstract class BankAccount {
-    private double balance;
-    private final String accountNumber;
-    private final List<Transaction> transactionHistory;
+    protected double balance;
+    protected final String accountNumber;
+    protected final List<Transaction> transactionHistory;
 
     // Constructor
     public BankAccount(double openingBalance, String accountNumber) {
@@ -16,22 +16,22 @@ public abstract class BankAccount {
     }
 
     // Método para depositar dinero
-    public void deposit(double amount) {
+    public void deposit(double amount, String accountNumber ) {
         if (amount > 0) {
             balance += amount;
-            addTransaction(new Transaction("Depósito", amount, "Depósito a cuenta"));
+            addTransaction(new Transaction(amount, accountNumber));
         } else {
             System.out.println("Monto de depósito inválido.");
         }
     }
 
     // Método para transferir dinero a otra cuenta
-    public void transfer(BankAccount destinationAccount, double amount) {
+    public void transfer(double amount ,BankAccount destinationAccount) {
         if (amount > 0 && amount <= balance) {
             balance -= amount;
-            destinationAccount.deposit(amount);
-            addTransaction(new Transaction("Transferencia", -amount, "Transferencia a " + destinationAccount.getAccountNumber()));
-            destinationAccount.addTransaction(new Transaction("Transferencia", amount, "Transferencia desde " + accountNumber));
+            destinationAccount.deposit(amount, destinationAccount.accountNumber);
+            addTransaction(new Transaction(-amount, destinationAccount.getAccountNumber()));
+            destinationAccount.addTransaction(new Transaction(amount, accountNumber));
         } else {
             System.out.println("Monto de transferencia inválido o saldo insuficiente.");
         }

@@ -1,17 +1,18 @@
 package Corfo.exercise;
+import java.util.Optional;
 
 public class Customer {
     private String name;
     private String rut;
     private double currentAccount;
-    private double savingsAccount;
+    private Optional<Double> savingsAccount;
 
     // Constructor
     public Customer(String name, String rut, double currentAccount, double savingsAccount) {
         this.name = name;
         this.rut = rut;
         this.currentAccount = currentAccount;
-        this.savingsAccount = savingsAccount;
+        this.savingsAccount = Optional.of(savingsAccount);
     }
 
     // Getters
@@ -27,7 +28,7 @@ public class Customer {
         return currentAccount;
     }
 
-    public double getSavingsAccount() {
+    public Optional<Double> getSavingsAccount() {
         return savingsAccount;
     }
 
@@ -45,7 +46,7 @@ public class Customer {
     }
 
     public void setSavingsAccount(double savingsAccount) {
-        this.savingsAccount = savingsAccount;
+        this.savingsAccount = Optional.of(savingsAccount);
     }
 
     // Método para mostrar la información del cliente

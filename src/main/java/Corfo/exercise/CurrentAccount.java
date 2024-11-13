@@ -14,15 +14,15 @@ public class CurrentAccount  extends BankAccount{
     }
 
     @Override
-    public void transfer(BankAccount destinationAccount, double amount) {
+    public void transfer( double amount, BankAccount destinationAccount) {
         double administrationCharge = 0.05 * maintenanceCost;
         double totalAmount = amount + administrationCharge;
 
         if (totalAmount <= getBalance()) {
             setBalance(getBalance() - totalAmount);
-            destinationAccount.deposit(amount);
-            addTransaction(new Transaction("Transferencia", -totalAmount, "Transferencia a " + destinationAccount.getAccountNumber()));
-            destinationAccount.addTransaction(new Transaction("Transferencia", amount, "Transferencia desde " + getAccountNumber()));
+            destinationAccount.deposit(amount, destinationAccount.getAccountNumber());
+            addTransaction(new Transaction(-totalAmount, destinationAccount.getAccountNumber()));
+            destinationAccount.addTransaction(new Transaction(amount, destinationAccount.getAccountNumber()));
         } else {
             System.out.println("Saldo insuficiente para realizar la transferencia.");
         }

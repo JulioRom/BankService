@@ -16,32 +16,32 @@ public class SavingsAccount extends BankAccount {
 
     @Override
     public void updateMonthlyBalance() {
-        List<Transaction> transactions = getTransactionHistory();
-        double addDeposits = 0;
-        int depositsCounted = 0;
-
-        // Contamos los últimos 5 depósitos
-        for (int i = transactions.size() - 1; i >= 0 && depositsCounted < 5; i--) {
-            Transaction transaction = transactions.get(i);
-            if (transaction.getType().equals("Depósito")) {
-                addDeposits += transaction.getAmout();
-                depositsCounted++;
-            }
-        }
-
-        double increase = addDeposits * (1 + profitabilityPercentage);
-        setBalance(getBalance() + increase);
+        //Filtrar solo los depósitos (transacciones con cantidad positiva)
+        List<Transaction> transactions = this.transactionHistory.stream()
+                .filter(Transaction::isPayment)
+                .toList();
+        //Tomar solo los últimos cinco depósitos y sumar sus cantidades
+        double addDeposits = transactions.stream()
+                .skip(Math.max(0,transactions.size() - 5))
+                .mapToDouble(Transaction::getAmount)
+                .sum();
+        //Calcular el incremento de rentabilidad y actualizar el saldo
+        //el italo dijo algo y yo la hice, veamos k pasa
+        double increase = addDeposits * (1 + (profitabilityPercentage/100));
+        double newBalance = this.getBalance() + increase;
+        this.setBalance(newBalance);
     }
 
     @Override
-    public void transfer(BankAccount destinationAccount, double amount) {
-        double penalizedAmount = amount * (1 - withdrawalPenalty);
+    public void transfer( double amount, BankAccount destinationAccount) {
+        double penalizedAmount = amount * (profitabilityPercentage/100);
+        double finalAmount = amount - penalizedAmount;
 
-        if (penalizedAmount <= getBalance()) {
-            setBalance(getBalance() - penalizedAmount);
-            destinationAccount.deposit(amount);
-            addTransaction(new Transaction("Transferencia", -penalizedAmount, "Transferencia a " + destinationAccount.getAccountNumber()));
-            destinationAccount.addTransaction(new Transaction("Transferencia", amount, "Transferencia desde " + getAccountNumber()));
+        if (getBalance() >= amount) {
+            setBalance(getBalance() - amount);
+            destinationAccount.deposit(finalAmount, destinationAccount.accountNumber);
+            addTransaction(new Transaction(-amount, "Transferencia a " + destinationAccount.getAccountNumber()));
+            destinationAccount.addTransaction(new Transaction( finalAmount, "Transferencia desde " + getAccountNumber()));
         } else {
             System.out.println("Saldo insuficiente para realizar la transferencia.");
         }
